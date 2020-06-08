@@ -42,9 +42,9 @@ Correspondchess client side creates a WebSocket connection to the server. The cl
 a message to the server when the user acts and it updates the board when the
 servers sends a message.
 
-- [LatexCSS|https://latex.now.sh/] for the styling
-- [ChessboardJS|https://chessboardjs.com/] for the interactive chess board
-- [ChessJS|https://github.com/jhlywa/chess.js] for legal move constraints
+- [LatexCSS](https://latex.now.sh/) for the styling
+- [ChessboardJS](https://chessboardjs.com/) for the interactive chess board
+- [ChessJS](https://github.com/jhlywa/chess.js) for legal move constraints
 
 ## Server side
 

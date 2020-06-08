@@ -17,6 +17,7 @@ Configuration can be set via the environment or by a `.env` file in the working
 directory.
 
 |Name|Default|Notes|
+|---|---|---|
 |CORRESPONDCHESS_PHRASE|`kujlturenbvjccna`|Used to uniquely encode identifiers into shareable urls|
 |CORRESPONDCHESS_PORT|8080|Server listening port|
 
@@ -32,7 +33,7 @@ directory.
     |   browser    |                |    actix-web    |
     | JS WebSocket |  <-- JSON -->  | correspondchess |
     +--------------+                |         |       |
-                                    |	 ( SQLITE )   |
+                                    |    ( SQLITE )   |
                                     +-----------------+
 
 ## Client Side
@@ -60,7 +61,7 @@ moves. Data is stored in an SQLite database.
     | created |  +-->| game_id |
     +---------+      | created |
                      | move    |
-		     +---------+
+                     +---------+
 
 ## WebSocket Protocol
 

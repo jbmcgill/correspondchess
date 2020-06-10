@@ -39,9 +39,9 @@ struct MoveRow {
 
 #[derive(Debug,Serialize)]
 pub struct GameResponse {
-    id: i32,
-    created: i64,
-    moves: Vec<String>,
+    pub id: i32,
+    pub created: i64,
+    pub moves: Vec<String>,
 }
 
 impl From<(Game, Vec<MoveRow>)> for GameResponse {

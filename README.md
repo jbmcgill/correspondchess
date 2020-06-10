@@ -63,6 +63,82 @@ moves. Data is stored in an SQLite database.
                      | move    |
                      +---------+
 
+
+## REST Protocol
+
+The REST protocol is used for correspondence games. It is also used for creating
+new games.
+
+When a game is created two game links are generated with identifiers encoded in a
+harshid ([game_id, WHITE_OR_BLACK]). One URL is the link for the white player,
+the other for the black player.
+
+### PUT /game 
+
+Create a new game.
+
+#### Request
+
+```json
+{
+CreateGameRequest: {
+                    "white": "white nickname",
+	            "black": "black nickname"
+                   }
+}
+
+```
+
+#### Response
+
+```json
+{
+  "CreateGameResponse": {
+                         "white": "link for white player",
+                         "black": "link for black player"
+                        }
+}
+```
+
+### GET /game/{game link}
+
+Parses the game link and returns the current game.
+
+```json
+{
+  "GetGameResponse": {
+                      "players": { "white": "Fred", "black": "Wilma" },
+		      "you_are": "white",
+		      "to_move": "black",
+		      "fen": "FEN string",
+		      "history": ["SAN","SAN","SAN","SAN", ...]
+                     }
+}
+```
+
+### POST /game/{game link}/move
+
+#### Request
+
+```json
+{
+  "PlayerMoveRequest": {
+                         "san": "SAN"
+                       }
+}
+```
+
+#### Response
+
+```json
+{
+  "PlayerMoveResponse": {
+                          "status": "OK|ERROR",
+			  "description": "description"
+                        }
+}
+```
+
 ## WebSocket Protocol
 
 When a game is created two game links are generated with identifiers encoded in a

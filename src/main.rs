@@ -50,4 +50,7 @@ fn main() {
     };
     let result = chess::validate(&g, "Na3".to_string());
     println!("result: {:?}", result);
+    
+    let result = chess::validate(&g, "Ba3".to_string());
+    println!("result: {:?}", result);
 }

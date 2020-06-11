@@ -81,10 +81,8 @@ Create a new game.
 
 ```json
 {
-CreateGameRequest: {
-                    "white": "white nickname",
-	            "black": "black nickname"
-                   }
+	"white": "white nickname",
+	"black": "black nickname"
 }
 
 ```
@@ -93,10 +91,8 @@ CreateGameRequest: {
 
 ```json
 {
-  "CreateGameResponse": {
-                         "white": "link for white player",
-                         "black": "link for black player"
-                        }
+	"white": "link for white player",
+	"black": "link for black player"
 }
 ```
 
@@ -106,13 +102,11 @@ Parses the game link and returns the current game.
 
 ```json
 {
-  "GetGameResponse": {
-                      "players": { "white": "Fred", "black": "Wilma" },
-		      "you_are": "white",
-		      "to_move": "black",
-		      "fen": "FEN string",
-		      "history": ["SAN","SAN","SAN","SAN", ...]
-                     }
+	"created": "{created}",
+	"white": "{nick}",
+	"black": "{nick}",
+	"side" : "white|black",
+	"moves": ["SAN","SAN","SAN","SAN", "..."]
 }
 ```
 

@@ -7,6 +7,8 @@ use shakmaty::{Chess, Position};
 mod chess;
 mod models;
 mod schema;
+mod webapp;
+mod api;
 
 fn main() {
     dotenv::dotenv().ok();
@@ -14,7 +16,7 @@ fn main() {
     let url = ::std::env::var("DATABASE_URL").unwrap();
     let conn = SqliteConnection::establish(&url).unwrap();
 
-    match models::Game::create(&conn) {
+    match models::Game::create(&conn, "Neil".to_string(), "Chris".to_string()) {
         Ok(id) => {
             println!("New ID is {}", id);
             for x in ["f2", "d2", "e4", "e3"].iter() {

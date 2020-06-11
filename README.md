@@ -116,20 +116,16 @@ Parses the game link and returns the current game.
 
 ```json
 {
-  "PlayerMoveRequest": {
-                         "san": "SAN"
-                       }
+	"san": "SAN"
 }
 ```
 
 #### Response
 
 ```json
-{
-  "PlayerMoveResponse": {
-                          "status": "OK|ERROR",
-			  "description": "description"
-                        }
+{ 
+	"status": "true|false",
+	"description": "description"
 }
 ```
 

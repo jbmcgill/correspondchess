@@ -20,7 +20,7 @@ fn main() {
         Ok(id) => {
             println!("New ID is {}", id);
             for x in ["f2", "d2", "e4", "e3"].iter() {
-                match models::Game::turn(&conn, id, String::from(*x)) {
+                match models::Game::turn(&conn, id, &String::from(*x)) {
                     Ok(_) => println!("--> inserted move {}", x),
                     Err(e) => println!("--> ERROR: {:#?}", e),
                 }
@@ -43,6 +43,8 @@ fn main() {
     let g = models::GameResponse {
         id: 0,
         created: 0,
+        white: "Neil".to_string(),
+        black: "Chris".to_string(),
         moves: vec![
             "b2b4".to_string(),
             "b7b5".to_string(),
@@ -50,9 +52,9 @@ fn main() {
             "bxc4".to_string(),
         ],
     };
-    let result = chess::validate(&g, "Na3".to_string());
+    let result = chess::validate(&g, &"Na3".to_string());
     println!("result: {:?}", result);
     
-    let result = chess::validate(&g, "Ba3".to_string());
+    let result = chess::validate(&g, &"Ba3".to_string());
     println!("result: {:?}", result);
 }

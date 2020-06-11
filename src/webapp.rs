@@ -1,5 +1,5 @@
 use actix_files as fs;
-use actix_web::{middleware, get, put, web, App, Error, HttpResponse, HttpServer};
+use actix_web::{middleware, get, post, put, web, App, Error, HttpResponse, HttpServer};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use harsh::Harsh;
@@ -86,6 +86,38 @@ async fn put_game(
     }
 }
 
+#[post("/game/{slug}/move")]
+async fn post_move(
+    data: web::Data<AppData>,
+    slug: web::Path<String>,
+    form: web::Json<api::rest::PlayerMoveRequest>,
+) -> Result<HttpResponse, Error> {
+    let ctx = data.into_inner();
+
+    if let Ok(conn) = ctx.pool.get() {
+        let result = web::block(move || {
+            if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
+                let id = ids[1] as i32;
+                models::Game::turn(&conn, id, &form.san)
+            }else{
+                Err(diesel::result::Error::from(diesel::result::Error::NotFound))
+            }
+        })
+        .await;
+        match result {
+            Ok(_) => {
+                let response = api::rest::PlayerMoveResponse{ status: true, description: "Player moved".to_string()};
+                return Ok(HttpResponse::Ok().json(response))
+            },
+            Err(_) => {
+                let response = api::rest::PlayerMoveResponse{ status: false, description: "Failed player move".to_string()};
+                return Ok(HttpResponse::Ok().json(response))                
+            }
+        }
+    } else {
+        return Err(Error::from(HttpResponse::InternalServerError().finish()));
+    }
+}
 pub async fn start(config: &'static Config) -> std::io::Result<()> {
     let manager = ConnectionManager::<SqliteConnection>::new(&config.db);
     let pool = r2d2::Pool::builder()

@@ -17,7 +17,7 @@ pub enum MoveResult {
     Stalemate,
     Legal,
 }
-pub fn validate(g: &GameResponse, mv: String) -> Result<MoveResult, Error> {
+pub fn validate(g: &GameResponse, mv: &String) -> Result<MoveResult, Error> {
     let mut pos = Chess::default();
 
     // play through game history to set up board

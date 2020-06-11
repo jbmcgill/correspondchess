@@ -38,7 +38,7 @@ struct MoveRow {
     player_move: String,
 }
 
-#[derive(Debug,Serialize)]
+#[derive(Debug, Serialize)]
 pub struct GameResponse {
     pub id: i32,
     pub white: String,
@@ -50,7 +50,7 @@ pub struct GameResponse {
 impl From<(Game, Vec<MoveRow>)> for GameResponse {
     fn from(x: (Game, Vec<MoveRow>)) -> GameResponse {
         let mut history = x.1.clone();
-        history.sort_by(|a,b| b.id.cmp(&a.id));
+        history.sort_by(|a, b| b.id.cmp(&a.id));
         GameResponse {
             id: x.0.id,
             white: x.0.white,
@@ -70,21 +70,34 @@ impl Game {
     }
 
     /// Create a new game. Returns the newly created game's ID.
-    pub fn create(conn: &SqliteConnection, white: String, black: String) -> Result<i32, diesel::result::Error> {
+    pub fn create(
+        conn: &SqliteConnection,
+        white: String,
+        black: String,
+    ) -> Result<i32, diesel::result::Error> {
         let created_at = Utc::now().timestamp_nanos();
         diesel::insert_into(game_dsl::game)
-            .values( (game_dsl::created.eq(created_at), game_dsl::white.eq(white), game_dsl::black.eq(black)) )
+            .values((
+                game_dsl::created.eq(created_at),
+                game_dsl::white.eq(white),
+                game_dsl::black.eq(black),
+            ))
             .execute(conn)?;
         let game_id: i32 = diesel::select(last_insert_rowid).first(conn)?;
         Ok(game_id)
     }
 
     /// Add a player turn move to a game.
-    pub fn turn(conn: &SqliteConnection, id: i32, mv: String) -> Result<(), diesel::result::Error> {
-        diesel::insert_into(moves_dsl::moves)
-            .values((moves_dsl::game_id.eq(id), moves_dsl::player_move.eq(mv)))
-            .execute(conn)?;
-        Ok(())
+    pub fn turn(conn: &SqliteConnection, id: i32, mv: &String) -> Result<(), diesel::result::Error> {
+        let game_obj = Game::find(conn, id)?;
+        match crate::chess::validate(&game_obj, mv) {
+            Ok(_) => {
+                diesel::insert_into(moves_dsl::moves)
+                    .values((moves_dsl::game_id.eq(id), moves_dsl::player_move.eq(mv)))
+                    .execute(conn)?;
+                Ok(())
+            }
+            Err(_) => Err(diesel::result::Error::from(diesel::result::Error::NotFound)),
+        }
     }
 }
-

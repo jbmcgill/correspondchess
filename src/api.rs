@@ -22,4 +22,15 @@ pub mod rest {
         pub side: String,
         pub moves: Vec<String>,
     }
+
+    #[derive(Deserialize)]
+    pub struct PlayerMoveRequest{
+        pub san: String,
+    }
+
+    #[derive(Serialize)]
+    pub struct PlayerMoveResponse{
+        pub status: bool,
+        pub description: String,
+    }
 }

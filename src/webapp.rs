@@ -1,5 +1,5 @@
 use actix_files as fs;
-use actix_web::{middleware, get, post, put, web, App, Error, HttpResponse, HttpServer};
+use actix_web::{get, middleware, post, put, web, App, Error, HttpResponse, HttpServer};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use harsh::Harsh;
@@ -26,23 +26,29 @@ async fn get_game(
     slug: web::Path<String>,
 ) -> Result<HttpResponse, Error> {
     let ctx = data.into_inner();
-    if let Ok(ids) = ctx.harsh.decode(slug.into_inner()){
+    if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
         if let Ok(conn) = ctx.pool.get() {
             let game_id = ids[1] as i32;
-            let side = if ids[2] == 0 { "white".to_string() } else { "black".to_string() };
-            if let Ok(game_obj) = models::Game::find(&conn, game_id){
-                let response = api::rest::GetGameResponse{
-                    created: game_obj.created,
-                    white: game_obj.white,
-                    black: game_obj.black,
-                    side: side,
-                    moves: game_obj.moves,
-                };
-                return Ok(HttpResponse::Ok().json(response))
-            }else{
-                return Err(Error::from(HttpResponse::InternalServerError().finish()));
-            }
-        }else{
+            let side = if ids[2] == 0 {
+                "white".to_string()
+            } else {
+                "black".to_string()
+            };
+            let game_obj = web::block(move || models::Game::find(&conn, game_id))
+                .await
+                .map_err(|e| {
+                    eprintln!("{}", e);
+                    HttpResponse::InternalServerError().finish()
+                })?;
+            let response = api::rest::GetGameResponse {
+                created: game_obj.created,
+                white: game_obj.white,
+                black: game_obj.black,
+                side: side,
+                moves: game_obj.moves,
+            };
+            return Ok(HttpResponse::Ok().json(response));
+        } else {
             return Err(Error::from(HttpResponse::InternalServerError().finish()));
         }
     } else {
@@ -99,19 +105,25 @@ async fn post_move(
             if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
                 let id = ids[1] as i32;
                 models::Game::turn(&conn, id, &form.san)
-            }else{
+            } else {
                 Err(diesel::result::Error::from(diesel::result::Error::NotFound))
             }
         })
         .await;
         match result {
             Ok(_) => {
-                let response = api::rest::PlayerMoveResponse{ status: true, description: "Player moved".to_string()};
-                return Ok(HttpResponse::Ok().json(response))
-            },
+                let response = api::rest::PlayerMoveResponse {
+                    status: true,
+                    description: "Player moved".to_string(),
+                };
+                return Ok(HttpResponse::Ok().json(response));
+            }
             Err(_) => {
-                let response = api::rest::PlayerMoveResponse{ status: false, description: "Failed player move".to_string()};
-                return Ok(HttpResponse::Ok().json(response))                
+                let response = api::rest::PlayerMoveResponse {
+                    status: false,
+                    description: "Failed player move".to_string(),
+                };
+                return Ok(HttpResponse::Ok().json(response));
             }
         }
     } else {

@@ -117,10 +117,10 @@ async fn post_move(
                 };
                 return Ok(HttpResponse::Ok().json(response));
             }
-            Err(_) => {
+            Err(e) => {
                 let response = api::rest::PlayerMoveResponse {
                     status: false,
-                    description: "Failed player move".to_string(),
+                    description: e.to_string(),
                 };
                 return Ok(HttpResponse::Ok().json(response));
             }

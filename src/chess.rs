@@ -13,12 +13,16 @@ pub enum Error {
 
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self{
-            Error::InvalidMove(e) => e.to_string(),
-            Error::InvalidGameHistoryNotation(e) => e.to_string(),
-            Error::InvalidGameHistoryMove(e) => e.to_string(),
-            Error::InvalidMoveNotation(e) => e.to_string(),
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Error::InvalidMove(e) => e.to_string(),
+                Error::InvalidGameHistoryNotation(e) => e.to_string(),
+                Error::InvalidGameHistoryMove(e) => e.to_string(),
+                Error::InvalidMoveNotation(e) => e.to_string(),
+            }
+        )
     }
 }
 #[derive(Debug)]
@@ -64,10 +68,10 @@ pub fn validate(g: &GameResponse, mv: &String) -> Result<MoveResult, Error> {
 
     // check to see if move caused a win or draw
     let result = if pos.is_checkmate() {
-        MoveResult::Checkmate    
-    }else if pos.is_stalemate(){
+        MoveResult::Checkmate
+    } else if pos.is_stalemate() {
         MoveResult::Stalemate
-    }else {
+    } else {
         MoveResult::Legal
     };
     Ok(result)

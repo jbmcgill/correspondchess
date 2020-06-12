@@ -18,8 +18,9 @@ directory.
 
 |Name|Default|Notes|
 |---|---|---|
-|CORRESPONDCHESS_PHRASE|`kujlturenbvjccna`|Used to uniquely encode identifiers into shareable urls|
-|CORRESPONDCHESS_PORT|8080|Server listening port|
+|CORRESPONDCHESS_PHRASE|kujlturenbvjccna|Used to uniquely encode identifiers into shareable urls|
+|CORRESPONDCHESS_BIND|127.0.0.1:8080|Server listening port|
+|CORRESPONDCHESS_DB|correspondchess.db|SQLite database file|
 
 # Usage
 

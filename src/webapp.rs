@@ -10,8 +10,7 @@ use crate::models;
 
 pub struct Config {
     pub db: String,
-    pub bind_port: i32,
-    pub bind_ip: String,
+    pub bind: String,
     pub salt: String,
 }
 
@@ -152,6 +151,5 @@ pub async fn start(config: Config) -> std::io::Result<()> {
             //.service(web::resource("/ws/{poll_id}").to(websocket_handler))
             .service(fs::Files::new("/static/", "static/"))
     });
-    let bind = format!("{}:{}", config.bind_ip, config.bind_port);
-    server.bind(&bind)?.run().await
+    server.bind(&config.bind)?.run().await
 }

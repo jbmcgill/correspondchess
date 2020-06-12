@@ -9,10 +9,10 @@ use crate::api;
 use crate::models;
 
 pub struct Config {
-    db: String,
-    bind_port: i32,
-    bind_ip: i32,
-    salt: String,
+    pub db: String,
+    pub bind_port: i32,
+    pub bind_ip: String,
+    pub salt: String,
 }
 
 struct AppData {
@@ -130,7 +130,7 @@ async fn post_move(
         return Err(Error::from(HttpResponse::InternalServerError().finish()));
     }
 }
-pub async fn start(config: &'static Config) -> std::io::Result<()> {
+pub async fn start(config: Config) -> std::io::Result<()> {
     let manager = ConnectionManager::<SqliteConnection>::new(&config.db);
     let pool = r2d2::Pool::builder()
         .build(manager)
@@ -147,6 +147,8 @@ pub async fn start(config: &'static Config) -> std::io::Result<()> {
             })
             .wrap(middleware::Logger::default())
             .service(put_game)
+            .service(get_game)
+            .service(post_move)
             //.service(web::resource("/ws/{poll_id}").to(websocket_handler))
             .service(fs::Files::new("/static/", "static/"))
     });

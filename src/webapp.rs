@@ -103,9 +103,9 @@ async fn post_move(
         let result = web::block(move || {
             if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
                 let id = ids[1] as i32;
-                models::Game::turn(&conn, id, &form.san)
+                models::Game::turn(&conn, id, &form.san).map_err(|e| e.to_string())
             } else {
-                Err(diesel::result::Error::from(diesel::result::Error::NotFound))
+                Err("Could not decode slug".to_string())
             }
         })
         .await;

@@ -11,6 +11,16 @@ pub enum Error {
     InvalidMoveNotation(String),
 }
 
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self{
+            Error::InvalidMove(e) => e.to_string(),
+            Error::InvalidGameHistoryNotation(e) => e.to_string(),
+            Error::InvalidGameHistoryMove(e) => e.to_string(),
+            Error::InvalidMoveNotation(e) => e.to_string(),
+        })
+    }
+}
 #[derive(Debug)]
 pub enum MoveResult {
     Checkmate,

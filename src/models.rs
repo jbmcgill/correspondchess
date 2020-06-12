@@ -60,12 +60,27 @@ impl From<(Game, Vec<MoveRow>)> for GameResponse {
         }
     }
 }
+
+#[derive(Debug)]
+pub enum Error {
+  Db(diesel::result::Error),
+  Chess(crate::chess::Error),
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            Error::Db(e) => e.to_string(),
+            Error::Chess(e) => e.to_string(),
+        })
+    }
+}
 /// Main interface for working the games and moves data.
 impl Game {
     /// Select a game by ID.
-    pub fn find(conn: &SqliteConnection, id: i32) -> Result<GameResponse, diesel::result::Error> {
-        let game_obj = game_dsl::game.find(id).first::<Game>(conn)?;
-        let moves_list = MoveRow::belonging_to(&game_obj).load::<MoveRow>(conn)?;
+    pub fn find(conn: &SqliteConnection, id: i32) -> Result<GameResponse, Error> {
+        let game_obj = game_dsl::game.find(id).first::<Game>(conn).map_err(|e|Error::Db(e))?;
+        let moves_list = MoveRow::belonging_to(&game_obj).load::<MoveRow>(conn).map_err(|e|Error::Db(e))?;
         Ok(GameResponse::from((game_obj, moves_list)))
     }
 
@@ -74,7 +89,7 @@ impl Game {
         conn: &SqliteConnection,
         white: String,
         black: String,
-    ) -> Result<i32, diesel::result::Error> {
+    ) -> Result<i32, Error> {
         let created_at = Utc::now().timestamp_nanos();
         diesel::insert_into(game_dsl::game)
             .values((
@@ -82,22 +97,22 @@ impl Game {
                 game_dsl::white.eq(white),
                 game_dsl::black.eq(black),
             ))
-            .execute(conn)?;
-        let game_id: i32 = diesel::select(last_insert_rowid).first(conn)?;
+            .execute(conn).map_err(|e|Error::Db(e))?;
+        let game_id: i32 = diesel::select(last_insert_rowid).first(conn).map_err(|e|Error::Db(e))?;
         Ok(game_id)
     }
 
     /// Add a player turn move to a game.
-    pub fn turn(conn: &SqliteConnection, id: i32, mv: &String) -> Result<(), diesel::result::Error> {
+    pub fn turn(conn: &SqliteConnection, id: i32, mv: &String) -> Result<(), Error> {
         let game_obj = Game::find(conn, id)?;
         match crate::chess::validate(&game_obj, mv) {
             Ok(_) => {
                 diesel::insert_into(moves_dsl::moves)
                     .values((moves_dsl::game_id.eq(id), moves_dsl::player_move.eq(mv)))
-                    .execute(conn)?;
+                    .execute(conn).map_err(|e|Error::Db(e))?;
                 Ok(())
             }
-            Err(_) => Err(diesel::result::Error::from(diesel::result::Error::NotFound)),
+            Err(e) => Err(Error::Chess(e)),
         }
     }
 }

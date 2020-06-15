@@ -49,6 +49,8 @@ function updateUI(){
 		status="Check" 
 	}
 	$('#gameOverDiv').html("Status: "+ status)
+	$('#pgnDiv').scrollTop($('#pgnDiv')[0].scrollHeight);
+
 }
 function removeGreySquares () {
   $('#myBoard .square-55d63').css('background', '')

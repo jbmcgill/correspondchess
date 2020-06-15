@@ -1,0 +1,49 @@
+
+body{ 
+  font-family: Helvetica;
+  font-size: 16pt;
+  color: #999886;
+  margin: 0px;
+  padding: 0px;
+}
+
+h1, h2 {
+  border-bottom: solid 1px #aaa;
+}
+h1, h2, p {
+  margin: 16px;
+  margin-bottom: 2px;
+}
+
+#fendiv {
+  overflow: scroll;
+}
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.board{
+  width: 400px;
+}
+.status-box {
+  background-color: #eee;
+  margin: 0px;
+  padding: 16px;
+  border: solid 1px #ccc;
+  border-radius: 5px;
+}
+.board-box {
+  display: flex;
+  flex-wrap: wrap;
+  width: 616px;
+  margin: 10 auto;
+}
+.pgn-box {
+  margin-left: 16px;
+  font-family: courier;
+  font-size: 12pt;
+  height: 400px;
+  width: 200px;
+  overflow: scroll;
+}

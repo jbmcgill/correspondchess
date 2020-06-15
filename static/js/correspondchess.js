@@ -18,6 +18,9 @@ $(document).ready( function() {
     onSnapEnd: onSnapEnd
   }
   board = Chessboard('myBoard', config)
+  jQuery('#myBoard').on('scroll touchmove touchend touchstart contextmenu', function(e){
+                                                                               e.preventDefault();
+                                                                               });
   $.ajax({
   	url: "/game/"+ game_slug,
 	type: "GET",
@@ -25,7 +28,7 @@ $(document).ready( function() {
 	success: function(result){ 
 			result.moves.forEach( mv => game.move(mv) )
 			board.position(game.fen())
-		updateUI()
+			updateUI()
 		},
 	error: function(error){ console.log(error) },
   })
@@ -35,20 +38,19 @@ function updateUI(){
 	$('#fenDiv').html(game.fen())
 	$('#pgnDiv').html(game.pgn({ max_width: 5, newline_char: '<br />' }))
 	var l = (game.history().length % 2) == 0 ? "White" : "Black"
-        $('#sideToMoveDiv').html(l +' to move')
-	var status = "In-Play"
+	var status = "In-Play - "+ l +" to move"
         if (game.in_stalemate()) { 
-		status="Stalemate" 
+		status="Stalemate - Game Over" 
 	} else if (game.in_draw()) { 
-		status="Draw" 
+		status="Draw - Game Over" 
 	} else if (game.in_threefold_repetition()) { 
 		status="Threefold repetition" 
 	} else if (game.in_checkmate()) { 
-		status="Checkmate" 
+		status="Checkmate - "+ ((game.history().length % 2) == 0 ? "Black": "White") +" Wins" 
 	} else if (game.in_check()) { 
-		status="Check" 
+		status="Check - "+ l +" to move" 
 	}
-	$('#gameOverDiv').html("Status: "+ status)
+	$('#statusDiv').html("Status: "+ status)
 	$('#pgnDiv').scrollTop($('#pgnDiv')[0].scrollHeight);
 
 }

@@ -149,7 +149,7 @@ pub async fn start(config: Config) -> std::io::Result<()> {
             .service(get_game)
             .service(post_move)
             //.service(web::resource("/ws/{poll_id}").to(websocket_handler))
-            .service(fs::Files::new("/static/", "static/"))
+            .service(fs::Files::new("/", "static/").index_file("index.html"))
     });
     server.bind(&config.bind)?.run().await
 }

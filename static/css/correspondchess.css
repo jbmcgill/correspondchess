@@ -7,15 +7,10 @@ body{
   padding: 0px;
 }
 
-h1, h2, p {
-  margin: 16px;
-  margin-bottom: 2px;
-}
-
 #fendiv {
   overflow: scroll;
 }
-.content {
+.content-box {
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -43,4 +38,28 @@ h1, h2, p {
   height: 400px;
   width: 200px;
   overflow: scroll;
+}
+
+#welcome-box {
+  display: flex;
+  flex-wrap: none;
+  margin: 16 auto;
+}
+#welcome-left {
+  width: 45%;
+  padding-right: 16px;
+}
+
+#welcome-right {
+  border-left: solid 1px #aaa;
+  margin-left: 16px;
+  padding-left: 16px;
+  width: 45%;
+}
+
+#new-game-button, #join-game-button, #join-code-text {
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 16pt;
+  width: 100%;
 }

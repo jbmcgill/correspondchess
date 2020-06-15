@@ -3,10 +3,40 @@
 		<title>Correspondchess</title>
 		<link rel="stylesheet" href="css/chessboard-1.0.0.css" />
 		<link rel="stylesheet" href="css/correspondchess.css" />
+				<script>
+								function toggle(){
+												$("#welcome-box").hide()
+												$("#board-box").show()
+								}
+				</script>
 	</head>
 	<body>
-   <div class="content">
-		<div class="board-box status-box">
+   <a href="javascript: toggle()">Toggle</a>
+   <div class="content-box game-box">
+    <div class="content-box">
+			<div class="board-box" id="welcome-box">
+        <div id="welcome-left">
+				  <h2>Create New Game</h2>
+					<p>Create a correspondence chess game. 
+					<ul style="text-align: left">
+				    <li>No signup</li>
+				    <li>No membership</li>
+				    <li>Private and anonymous</li>
+					</ul>
+					Start a free anonymous online game of chess now!</p>
+					<button id="new-game-button">Create New Game</button>
+				</div>
+				<div id="welcome-right">
+				  <h2>Join Game</h2>
+					<p>Have you been invited to play a game of online chess?</p>
+					<p>Paste the invite code into the box below to join the game.
+					No signup required.</p>
+					<input type="text" id="join-code-text" /><br />
+					<button id="join-game-button">Join Game</button>
+				</div>
+			</div>
+		</div>
+		<div class="board-box status-box" id="board-box">
 			<div style="display: flex; width: 100%;">
 		    <div id="statusDiv" class="status-box">In-play</div>
       </div>
@@ -20,5 +50,8 @@
 	 <script src="js/chessboard-1.0.0.js"></script>
    <script src="js/chess.js"></script>
    <script src="js/correspondchess.js"></script>
+				<script>
+								$("#board-box").hide()
+				</script>
 	</body>
 </html>

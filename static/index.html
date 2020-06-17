@@ -3,15 +3,8 @@
 		<title>Correspondchess</title>
 		<link rel="stylesheet" href="css/chessboard-1.0.0.css" />
 		<link rel="stylesheet" href="css/correspondchess.css" />
-				<script>
-								function toggle(){
-												$("#welcome-box").hide()
-												$("#board-box").show()
-								}
-				</script>
 	</head>
 	<body>
-   <a href="javascript: toggle()">Toggle</a>
    <div class="content-box game-box">
     <div class="content-box">
 			<div class="board-box" id="welcome-box">
@@ -19,12 +12,12 @@
 				  <h2>Create New Game</h2>
 					<p>Create a correspondence chess game. 
 					<ul style="text-align: left">
-				    <li>No signup</li>
-				    <li>No membership</li>
+				    <li>Challenge a friend</li>
+				    <li>No Sign-Up</li>
 				    <li>Private and anonymous</li>
 					</ul>
 					Start a free anonymous online game of chess now!</p>
-					<button id="new-game-button">Create New Game</button>
+					<button id="new-game-button" onClick="showBox('#create-game-box')">Create New Game</button>
 				</div>
 				<div id="welcome-right">
 				  <h2>Join Game</h2>
@@ -32,8 +25,62 @@
 					<p>Paste the invite code into the box below to join the game.
 					No signup required.</p>
 					<input type="text" id="join-code-text" /><br />
-					<button id="join-game-button">Join Game</button>
+					<button id="join-game-button" onClick="showBox('#board-box')">Join Game</button>
 				</div>
+			</div>
+			<div id="create-game-box">
+				<div class="header">Create New Chess Game</div>
+				<div id="create-game-form">
+				  <div class="cg-row">
+				    <div class="cg-label">White handle</div>
+				   	<div><input id="white-handle" class="cg-input" type="text" /></div>
+					</div>
+				  <div class="cg-row">
+				    <div class="cg-label">Black handle</div>
+				   	<div><input id="black-handle" class="cg-input" type="text" /></div>
+					</div>
+				  <div class="cg-row">
+				   	<div class="cg-label"><input id="i-will-play-white" class="cg-input" type="checkbox" checked /></div>
+				    <div>I will play as White</div>
+					</div>
+					<div class="cg-row ok-cancel-row">
+						<button id="cancel-generate-game-button" onClick="showBox('#welcome-box')">Cancel</button>
+						<button id="generate-game-button" onClick="handleGenerateClick()">Next</button>
+					</div>
+				</div>
+			</div>
+			<div id="game-created-box">
+				<div class="header">New Chess Game Created</div>
+				<div class="cg-row">
+				  <div class="cg-label">Your link</div>
+				  <div><input id="your-link" class="cg-input" type="text" /></div>
+				</div>
+				<div class="cg-row">
+				  <div class="cg-label">Opponent link</div>
+				  <div><input id="opponent-link" class="cg-input" type="text" /></div>
+				</div>
+				<div id="start-game-row" class="cg-row">
+				 <div id="send-link-box">
+				     <div id="send-link-heading">Send link to your opponent</div>
+						 <div id="send-link-options">
+				       <div><img src="img/share/email.png"><br />Email</div>
+				       <div><img src="img/share/messenger.png"><br />Messenger</div>
+				       <div><img src="img/share/twitter.png"><br />Twitter DM</div>
+				       <div><img src="img/share/qrcode.svg"><br />QR Code</div>
+				       <div><img src="img/share/sms.svg"><br />SMS</div>
+						 </div>
+					 </div>
+				   <div id="start-game-box"><button id="start-game-button" onClick="showBox('#board-box')">Start Game</button></div>
+				 </div>
+			 </div>
+			</div>
+		</div>
+		<div id="error-box">
+			<div id="error-ok-row" class="cg-row">
+		  	<div class="header">Error</div>
+		  	<p>Unfortunately there was an error whe  attempting to create your
+		  	game. Please try again later.</p>
+		  	<div id="error-ok-box"><button id="error-ok-button" onClick="showBox('#create-game-box')">Ok</button></div>
 			</div>
 		</div>
 		<div class="board-box status-box" id="board-box">
@@ -50,8 +97,9 @@
 	 <script src="js/chessboard-1.0.0.js"></script>
    <script src="js/chess.js"></script>
    <script src="js/correspondchess.js"></script>
+	 <script src="js/random-names.js"></script>
 				<script>
-								$("#board-box").hide()
+								showBox('#welcome-box');
 				</script>
 	</body>
 </html>

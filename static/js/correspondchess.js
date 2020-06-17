@@ -33,6 +33,7 @@ $(document).ready( function() {
 	error: function(error){ console.log(error) },
   })
 })
+
 function updateUI(){
 
 	$('#fenDiv').html(game.fen())
@@ -54,6 +55,40 @@ function updateUI(){
 	$('#pgnDiv').scrollTop($('#pgnDiv')[0].scrollHeight);
 
 }
+
+
+function handleGenerateClick(){
+   data = { white: $("#white-handle").val(),
+	   black: $("#black-handle").val()
+   }
+   alert(JSON.stringify(data))
+   
+ $.ajax({ url: "/game",
+          type: "PUT",
+	  contentType:"application/json; charset=utf-8",
+	  data: JSON.stringify(data),
+	  success: function(result){ 
+		  alert(JSON.stringify(result))
+		},
+	  error: function(error){ console.log(error) },
+ 		});
+  alert("click!")
+}
+
+
+function showBox(id){
+    $("#welcome-box").hide()
+    $("#game-created-box").hide()
+    $("#create-game-box").hide()
+    $("#error-box").hide()
+    $("#board-box").hide()
+    $(id).animate({"opacity": "show"}, 500)
+    if( id == '#create-game-box'){
+	$('#white-handle').val(generateName())
+	$('#black-handle').val(generateName())
+    }
+}
+
 function removeGreySquares () {
   $('#myBoard .square-55d63').css('background', '')
 }

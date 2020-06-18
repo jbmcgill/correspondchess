@@ -56,6 +56,35 @@ function updateUI() {
 
 }
 
+function handleNewGameCreated(x) {
+
+  var id, side, your_link, opponent_link
+
+  if ($("#i-will-play-white").val()) {
+    id = x.white
+    side = "white"
+    your_link = x.white
+    opponent_link = x.black
+  } else {
+    id = x.black
+    your_link = x.black
+    opponent_link = x.white
+    side = "white"
+  }
+
+  localStorage.setItem(id, JSON.stringify({ white: x.white, 
+                                            black: x.black, 
+                                            side: side, 
+                                            state: "in-play", 
+                                            turn: "white", 
+                                            notes: ""
+                                          }))
+
+  //alert(localStorage.getItem(id))
+  $("#your-link").val(your_link)
+  $("#opponent-link").val(opponent_link)
+  showBox("#game-created-box")
+}
 
 function handleGenerateClick() {
   data = {
@@ -69,7 +98,7 @@ function handleGenerateClick() {
     contentType: "application/json; charset=utf-8",
     data: JSON.stringify(data),
     success: function (result) {
-      alert(JSON.stringify(result))
+      handleNewGameCreated(result);
     },
     error: function (error) { console.log(error) },
   });

@@ -111,6 +111,7 @@ body{
   margin-right: 64px;
   margin-bottom: 32px;
   margin: 32px;
+  align-items: center;
 }
 #start-game-box, #error-ok-box {
   margin-left: 32px;
@@ -118,7 +119,6 @@ body{
 #start-game-button{
   padding: 6px;
   font-size: 16pt;
-  margin-top: 32px;
 }
 .ok-cancel-row {
   justify-content: space-around;
@@ -130,32 +130,8 @@ body{
 	width: 100%;
 }
 
-#send-link-box {
-  width: 70%;
-}
-
 #send-link-heading {
   font-weight: bold;
   font-size: 12pt;
-  width: 100%;
-  margin-bottom: 32px;
 }
 
-#send-link-options {
-  display: flex;
-  flex-wrap: none;
-  justify-content: space-around;
-}
-
-#send-link-options > div {
-  font-size: 10pt;
-  text-align: center;
-  color: #333;
-  opacity: 0.5;
-}
-#send-link-options > div:hover {
-  opacity: 1.0;
-}
-#send-link-options > div > img {
-  width: 35px;
-}

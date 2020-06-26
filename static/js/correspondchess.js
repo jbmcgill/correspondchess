@@ -6,6 +6,7 @@ var blackSquareGrey = '#696969'
 
 var hash = $(location).attr('hash');
 var game_slug = hash.replace("#", "");
+var savedGames = loadSavedGames();
 $(document).ready(function () {
   var config = {
     draggable: true,
@@ -26,6 +27,7 @@ $(document).ready(function () {
     type: "GET",
     contentType: "application/json; charset=utf-8",
     success: function (result) {
+      if( result.side == "black" ) board.flip()
       result.moves.forEach(mv => game.move(mv))
       board.position(game.fen())
       updateUI()
@@ -56,11 +58,20 @@ function updateUI() {
 
 }
 
+function loadSavedGames(){
+  var results = []
+  storage = window.localStorage
+  for ( var i=0; i< storage.length; i++){
+    var item = JSON.parse(storage.getItem(storage.key(i)))
+    results.push(item)
+  }
+  return results
+}
+
 function handleNewGameCreated(x) {
 
   var id, side, your_link, opponent_link
-
-  if ($("#i-will-play-white").val()) {
+  if ($("#i-will-play-white").is(":checked")) {
     id = x.white
     side = "white"
     your_link = x.white
@@ -69,20 +80,19 @@ function handleNewGameCreated(x) {
     id = x.black
     your_link = x.black
     opponent_link = x.white
-    side = "white"
+    side = "black"
   }
 
-  localStorage.setItem(id, JSON.stringify({ white: x.white, 
-                                            black: x.black, 
-                                            side: side, 
-                                            state: "in-play", 
-                                            turn: "white", 
-                                            notes: ""
-                                          }))
-
-  //alert(localStorage.getItem(id))
-  $("#your-link").val(your_link)
+  var obj = { white: x.white, 
+              black: x.black, 
+              side: side, 
+              state: "in-play", 
+              turn: "white", 
+              notes: ""
+             }
+  localStorage.setItem(id, JSON.stringify(obj))
   $("#opponent-link").val(opponent_link)
+  $("#your-link").val(your_link)
   showBox("#game-created-box")
 }
 

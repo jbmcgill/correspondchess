@@ -48,15 +48,14 @@ pub struct GameResponse {
 }
 
 impl From<(Game, Vec<MoveRow>)> for GameResponse {
-    fn from(x: (Game, Vec<MoveRow>)) -> GameResponse {
-        let mut history = x.1.clone();
-        history.sort_by(|a, b| a.id.cmp(&b.id));
+    fn from(mut x: (Game, Vec<MoveRow>)) -> GameResponse {
+        x.1.sort_by(|a, b| a.id.cmp(&b.id));
         GameResponse {
             id: x.0.id,
             white: x.0.white,
             black: x.0.black,
             created: x.0.created,
-            moves: history.iter().map(|x| x.player_move.clone()).collect(),
+            moves: x.1.iter().map(|x| x.player_move.to_owned()).collect(),
         }
     }
 }

@@ -47,9 +47,11 @@ async fn websocket_handler(
             },
             &req,
             stream,
-        );
+        )
     }
-    return Err(Error::from(HttpResponse::InternalServerError().finish()));
+    else{
+        Err(Error::from(HttpResponse::InternalServerError().finish()))
+    }
 }
 
 #[get("/game/{slug}")]

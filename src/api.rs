@@ -1,3 +1,18 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, Hash, PartialEq, Eq)]
+pub enum PlayerSide {
+    White,
+    Black,
+}
+impl From<u64> for PlayerSide {
+    fn from(x: u64) -> PlayerSide {
+        match x {
+            0 => PlayerSide::White,
+            1 => PlayerSide::Black,
+        }
+    }
+}
 pub mod rest {
     use serde::{Deserialize, Serialize};
 
@@ -34,7 +49,7 @@ pub mod rest {
     }
 }
 
-pub mod actor{
+pub mod actor {
     use actix::prelude::*;
     #[derive(Message)]
     #[rtype(usize)]
@@ -47,17 +62,19 @@ pub mod actor{
     pub struct DisconnectMessage {
         pub id: usize,
     }
+
+    #[derive(Message)]
+    #[rtype(result = "()")]
+    pub struct SubscribeMessage {
+        /// Client id
+        pub id: usize,
+        pub game_id: i32,
+        pub side: crate::api::PlayerSide,
+    }
 }
 pub mod ws {
     use actix::prelude::*;
     use serde::{Deserialize, Serialize};
-
-
-    #[derive(Debug, Clone, Serialize,Deserialize,Hash,PartialEq,Eq)]
-    pub enum PlayerSide {
-       White,
-       Black,
-    }
 
     #[derive(Clone, Debug, Serialize, Deserialize)]
     pub struct PlayerMoveMessage {
@@ -69,21 +86,13 @@ pub mod ws {
             PlayerMoveMessage { san: s.to_owned() }
         }
     }
-    #[derive(Clone, Debug, Message,Serialize,Deserialize)]
-    #[rtype(result = "()")]
-    pub struct SubscribeMessage {
-        /// Client id
-        pub id: usize,
-        pub game_id: i32,
-        pub side: PlayerSide,
-    }
 
     #[derive(Clone, Message, Serialize, Deserialize)]
     #[rtype(result = "()")]
     pub enum Message {
-        Subscribe(SubscribeMessage),
         OpponentMove(PlayerMoveMessage),
     }
+
     impl Message {
         pub fn json(self) -> Result<String, serde_json::error::Error> {
             serde_json::to_string(&self)

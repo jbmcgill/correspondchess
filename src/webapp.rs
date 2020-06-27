@@ -1,12 +1,19 @@
+use actix::prelude::*;
 use actix_files as fs;
-use actix_web::{get, middleware, post, put, web, App, Error, HttpResponse, HttpServer};
+use actix_web::{
+    get, middleware, post, put, web, App, Error, HttpRequest, HttpResponse, HttpServer,
+};
+use actix_web_actors::ws;
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use harsh::Harsh;
 use rand::Rng;
+use std::time::Instant;
 
 use crate::api;
 use crate::models;
+use crate::wsserver;
+use crate::wssession;
 
 pub struct Config {
     pub db: String,
@@ -17,6 +24,32 @@ pub struct Config {
 struct AppData {
     harsh: Harsh,
     pool: r2d2::Pool<ConnectionManager<SqliteConnection>>,
+    notify: Addr<wsserver::NotifyServer>,
+}
+
+/// Entry point for our websocket route
+async fn websocket_handler(
+    req: HttpRequest,
+    stream: web::Payload,
+    data: web::Data<AppData>,
+    slug: web::Path<String>,
+) -> Result<HttpResponse, Error> {
+    let ctx = data.into_inner();
+    if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
+        let game_id = ids[1] as i32;
+        let side = api::PlayerSide::from(ids[2]);
+        ws::start(
+            wssession::WsSession {
+                id: 0,
+                hb: Instant::now(),
+                subscription: wsserver::SubscribeKey { game_id, side },
+                addr: ctx.notify.clone(),
+            },
+            &req,
+            stream,
+        );
+    }
+    return Err(Error::from(HttpResponse::InternalServerError().finish()));
 }
 
 #[get("/game/{slug}")]
@@ -138,16 +171,19 @@ pub async fn start(config: Config) -> std::io::Result<()> {
         .salt(config.salt.to_owned())
         .build()
         .unwrap();
+    let notify_addr = wsserver::NotifyServer::setup();
     let server = HttpServer::new(move || {
         App::new()
             .data(AppData {
                 pool: pool.clone(),
                 harsh: harsh.clone(),
+                notify: notify_addr.clone(),
             })
             .wrap(middleware::Logger::default())
             .service(put_game)
             .service(get_game)
             .service(post_move)
+            .service(web::resource("/ws/{game_slug}").to(websocket_handler))
             //.service(web::resource("/ws/{poll_id}").to(websocket_handler))
             .service(fs::Files::new("/", "static/").index_file("index.html"))
     });

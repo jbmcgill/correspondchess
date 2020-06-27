@@ -9,7 +9,7 @@ use std::collections::{HashMap, HashSet};
 #[derive(Hash, PartialEq, Eq)]
 pub struct SubscribeKey {
     game_id: i32,
-    side: api::ws::PlayerSide,
+    side: api::PlayerSide,
 }
 
 /// `NotifyServer` manages game subscriptions and is responsible for coordinating subscription
@@ -89,10 +89,10 @@ impl Handler<api::actor::DisconnectMessage> for NotifyServer {
 }
 
 /// Subscribe to poll notification
-impl Handler<api::ws::SubscribeMessage> for NotifyServer {
+impl Handler<api::actor::SubscribeMessage> for NotifyServer {
     type Result = ();
 
-    fn handle(&mut self, msg: api::ws::SubscribeMessage, _: &mut SyncContext<Self>) {
+    fn handle(&mut self, msg: api::actor::SubscribeMessage, _: &mut SyncContext<Self>) {
         for (_n, sessions) in &mut self.games {
             sessions.remove(&msg.id);
         }

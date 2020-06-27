@@ -6,6 +6,8 @@ mod chess;
 mod models;
 mod schema;
 mod webapp;
+mod wsserver;
+mod wssession;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {

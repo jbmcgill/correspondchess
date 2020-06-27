@@ -1,15 +1,15 @@
 //! `NotifyServer` is an actor. It maintains list of connection client session.
 //! It rebroadcasts Notify messages to connected and subscribed clients.
 
+use crate::api;
 use actix::prelude::*;
 use rand::{self, rngs::ThreadRng, Rng};
 use std::collections::{HashMap, HashSet};
-use crate::api;
 
-#[derive(Hash,PartialEq,Eq)]
-pub struct SubscribeKey{
-  game_id: i32,
-  side: api::ws::PlayerSide,
+#[derive(Hash, PartialEq, Eq)]
+pub struct SubscribeKey {
+    game_id: i32,
+    side: api::ws::PlayerSide,
 }
 
 /// `NotifyServer` manages game subscriptions and is responsible for coordinating subscription
@@ -37,7 +37,7 @@ impl NotifyServer {
         actix::SyncArbiter::start(1, move || NotifyServer::default())
     }
 
-    /// Send message to all users subscribed to game 
+    /// Send message to all users subscribed to game
     fn send_message(&self, subscription: SubscribeKey, message: api::ws::Message) {
         if let Some(sessions) = self.games.get(&subscription) {
             for id in sessions {
@@ -59,7 +59,11 @@ impl Actor for NotifyServer {
 impl Handler<api::actor::ConnectMessage> for NotifyServer {
     type Result = usize;
 
-    fn handle(&mut self, msg: api::actor::ConnectMessage, _: &mut SyncContext<Self>) -> Self::Result {
+    fn handle(
+        &mut self,
+        msg: api::actor::ConnectMessage,
+        _: &mut SyncContext<Self>,
+    ) -> Self::Result {
         // register session with random id
         let id = self.rng.gen::<usize>();
         self.sessions.insert(id, msg.addr.clone());
@@ -89,13 +93,15 @@ impl Handler<api::ws::SubscribeMessage> for NotifyServer {
     type Result = ();
 
     fn handle(&mut self, msg: api::ws::SubscribeMessage, _: &mut SyncContext<Self>) {
-
         for (_n, sessions) in &mut self.games {
             sessions.remove(&msg.id);
         }
 
         self.games
-            .entry(SubscribeKey{game_id: msg.game_id, side: msg.side})
+            .entry(SubscribeKey {
+                game_id: msg.game_id,
+                side: msg.side,
+            })
             .or_insert(HashSet::new())
             .insert(msg.id);
     }

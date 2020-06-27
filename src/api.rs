@@ -15,7 +15,8 @@ impl From<u64> for PlayerSide {
         }
     }
 }
-impl PlayerSide{
+
+impl PlayerSide {
     pub fn opponent(&self) -> PlayerSide {
         match self {
             PlayerSide::White => PlayerSide::Black,
@@ -115,6 +116,11 @@ pub mod ws {
     impl Message {
         pub fn json(self) -> Result<String, serde_json::error::Error> {
             serde_json::to_string(&self)
+        }
+    }
+    impl From<PlayerMoveMessage> for Message {
+        fn from(x: PlayerMoveMessage) -> Message {
+            Message::OpponentMove(x)
         }
     }
 }

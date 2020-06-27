@@ -28,6 +28,7 @@ struct AppData {
 }
 
 /// Entry point for our websocket route
+#[post("/ws/{game_slug}")]
 async fn websocket_handler(
     req: HttpRequest,
     stream: web::Payload,
@@ -157,7 +158,7 @@ async fn post_move(
                 let move_msg = api::ws::PlayerMoveMessage { san: san };
                 let msg = api::actor::NotifyMessage {
                     key,
-                    msg: api::ws::Message::OpponentMove(move_msg),
+                    msg: api::ws::Message::from(move_msg),
                 };
                 let _ = ctx.notify.do_send(msg);
 
@@ -200,8 +201,7 @@ pub async fn start(config: Config) -> std::io::Result<()> {
             .service(put_game)
             .service(get_game)
             .service(post_move)
-            .service(web::resource("/ws/{game_slug}").to(websocket_handler))
-            //.service(web::resource("/ws/{poll_id}").to(websocket_handler))
+            .service(websocket_handler)
             .service(fs::Files::new("/", "static/").index_file("index.html"))
     });
     server.bind(&config.bind)?.run().await

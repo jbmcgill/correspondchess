@@ -31,6 +31,14 @@ $(document).ready(function () {
       result.moves.forEach(mv => game.move(mv))
       board.position(game.fen())
       updateUI()
+      const socket = new WebSocket('ws://localhost:8080/ws/'+ game_slug)
+      socket.addEventListener('message', function (event) {
+	var o = JSON.parse(event.data).OpponentMove
+	game.move(o.san)
+	board.position(game.fen())
+	updateUI()
+      });
+
     },
     error: function (error) { console.log(error) },
   })

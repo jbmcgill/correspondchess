@@ -85,7 +85,7 @@ pub mod actor {
         pub side: crate::api::PlayerSide,
     }
 
-    #[derive(Message)]
+    #[derive(Debug, Message)]
     #[rtype(result = "()")]
     pub struct NotifyMessage {
         pub key: crate::wsserver::SubscribeKey,
@@ -107,7 +107,7 @@ pub mod ws {
         }
     }
 
-    #[derive(Clone, Message, Serialize, Deserialize)]
+    #[derive(Clone, Debug, Message, Serialize, Deserialize)]
     #[rtype(result = "()")]
     pub enum Message {
         OpponentMove(PlayerMoveMessage),

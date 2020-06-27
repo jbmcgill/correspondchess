@@ -28,7 +28,7 @@ struct AppData {
 }
 
 /// Entry point for our websocket route
-#[post("/ws/{game_slug}")]
+#[get("/ws/{game_slug}")]
 async fn websocket_handler(
     req: HttpRequest,
     stream: web::Payload,
@@ -160,6 +160,7 @@ async fn post_move(
                     key,
                     msg: api::ws::Message::from(move_msg),
                 };
+                println!("sending msg to notify actor {:?}", msg);
                 let _ = ctx.notify.do_send(msg);
 
                 let response = api::rest::PlayerMoveResponse {

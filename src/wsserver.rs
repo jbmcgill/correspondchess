@@ -6,7 +6,7 @@ use actix::prelude::*;
 use rand::{self, rngs::ThreadRng, Rng};
 use std::collections::{HashMap, HashSet};
 
-#[derive(Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub struct SubscribeKey {
     pub game_id: i32,
     pub side: api::PlayerSide,

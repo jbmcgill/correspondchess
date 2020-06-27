@@ -1,9 +1,9 @@
 use std::time::{Duration, Instant};
 
+use crate::api;
+use crate::wsserver;
 use actix::*;
 use actix_web_actors::ws;
-use crate::wsserver;
-use crate::api;
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -16,7 +16,7 @@ pub struct WsSession {
     /// Client must send ping at least once per 10 seconds (CLIENT_TIMEOUT),
     /// otherwise we drop connection.
     pub hb: Instant,
-    /// subscribed to poll 
+    /// subscribed to poll
     pub subscription: wsserver::SubscribeKey,
     /// Notification server
     pub addr: Addr<wsserver::NotifyServer>,
@@ -50,12 +50,22 @@ impl Actor for WsSession {
                 }
                 fut::ready(())
             })
+            .then(|_res, act, _ctx| {
+                let m = api::actor::SubscribeMessage {
+                    id: act.id,
+                    game_id: act.subscription.game_id,
+                    side: act.subscription.side.clone(),
+                };
+                act.addr.do_send(m);
+                fut::ready(())
+            })
             .wait(ctx);
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
         // notify chat server
-        self.addr.do_send(api::actor::DisconnectMessage { id: self.id });
+        self.addr
+            .do_send(api::actor::DisconnectMessage { id: self.id });
         Running::Stop
     }
 }
@@ -71,11 +81,7 @@ impl Handler<api::ws::Message> for WsSession {
 
 /// WebSocket message handler
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
-    fn handle(
-        &mut self,
-        msg: Result<ws::Message, ws::ProtocolError>,
-        ctx: &mut Self::Context,
-    ) {
+    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         let msg = match msg {
             Err(_) => {
                 ctx.stop();
@@ -118,7 +124,8 @@ impl WsSession {
                 println!("Websocket Client heartbeat failed, disconnecting!");
 
                 // notify chat server
-                act.addr.do_send(api::actor::DisconnectMessage { id: act.id });
+                act.addr
+                    .do_send(api::actor::DisconnectMessage { id: act.id });
 
                 // stop actor
                 ctx.stop();
@@ -131,4 +138,3 @@ impl WsSession {
         });
     }
 }
-

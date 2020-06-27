@@ -41,7 +41,6 @@ directory.
 The correspondence web page uses Javascript to call the server's REST services.
 It is built with:
 
-- [LatexCSS](https://latex.now.sh/) for the styling
 - [ChessboardJS](https://chessboardjs.com/) for the interactive chess board
 - [ChessJS](https://github.com/jhlywa/chess.js) for legal move constraints
 

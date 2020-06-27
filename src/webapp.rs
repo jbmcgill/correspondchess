@@ -48,8 +48,7 @@ async fn websocket_handler(
             &req,
             stream,
         )
-    }
-    else{
+    } else {
         Err(Error::from(HttpResponse::InternalServerError().finish()))
     }
 }
@@ -135,17 +134,33 @@ async fn post_move(
     let ctx = data.into_inner();
 
     if let Ok(conn) = ctx.pool.get() {
+        let game_id: i32;
+        let side: api::PlayerSide;
+        let san: String = form.san.clone();
+        if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
+            game_id = ids[1] as i32;
+            side = api::PlayerSide::from(ids[2]);
+        } else {
+            return Err(Error::from(HttpResponse::InternalServerError().finish()));
+        }
         let result = web::block(move || {
-            if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
-                let id = ids[1] as i32;
-                models::Game::turn(&conn, id, &form.san).map_err(|e| e.to_string())
-            } else {
-                Err("Could not decode slug".to_string())
-            }
+            models::Game::turn(&conn, game_id, form.san.clone()).map_err(|e| e.to_string())
         })
         .await;
         match result {
             Ok(_) => {
+                let opponent = side.opponent();
+                let key = wsserver::SubscribeKey {
+                    game_id,
+                    side: opponent,
+                };
+                let move_msg = api::ws::PlayerMoveMessage { san: san };
+                let msg = api::actor::NotifyMessage {
+                    key,
+                    msg: api::ws::Message::OpponentMove(move_msg),
+                };
+                let _ = ctx.notify.do_send(msg);
+
                 let response = api::rest::PlayerMoveResponse {
                     status: true,
                     description: "Player moved".to_string(),

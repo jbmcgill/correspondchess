@@ -8,8 +8,8 @@ use std::collections::{HashMap, HashSet};
 
 #[derive(Hash, PartialEq, Eq)]
 pub struct SubscribeKey {
-    game_id: i32,
-    side: api::PlayerSide,
+    pub game_id: i32,
+    pub side: api::PlayerSide,
 }
 
 /// `NotifyServer` manages game subscriptions and is responsible for coordinating subscription
@@ -104,5 +104,20 @@ impl Handler<api::actor::SubscribeMessage> for NotifyServer {
             })
             .or_insert(HashSet::new())
             .insert(msg.id);
+    }
+}
+
+/// Handler for Notify message.
+///
+/// Send a message to a game's subscribed clients. 
+impl Handler<api::actor::NotifyMessage> for NotifyServer {
+    type Result = ();
+
+    fn handle(
+        &mut self,
+        msg: api::actor::NotifyMessage,
+        _: &mut SyncContext<Self>,
+    ) -> Self::Result {
+        let _ = self.send_message(msg.key, msg.msg);
     }
 }

@@ -102,9 +102,9 @@ impl Game {
     }
 
     /// Add a player turn move to a game.
-    pub fn turn(conn: &SqliteConnection, id: i32, mv: &String) -> Result<(), Error> {
+    pub fn turn(conn: &SqliteConnection, id: i32, mv: String) -> Result<(), Error> {
         let game_obj = Game::find(conn, id)?;
-        match crate::chess::validate(&game_obj, mv) {
+        match crate::chess::validate(&game_obj, &mv) {
             Ok(_) => {
                 diesel::insert_into(moves_dsl::moves)
                     .values((moves_dsl::game_id.eq(id), moves_dsl::player_move.eq(mv)))

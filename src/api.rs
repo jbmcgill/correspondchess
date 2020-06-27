@@ -4,12 +4,23 @@ use serde::{Deserialize, Serialize};
 pub enum PlayerSide {
     White,
     Black,
+    None,
 }
 impl From<u64> for PlayerSide {
     fn from(x: u64) -> PlayerSide {
         match x {
             0 => PlayerSide::White,
             1 => PlayerSide::Black,
+            _ => PlayerSide::None,
+        }
+    }
+}
+impl PlayerSide{
+    pub fn opponent(&self) -> PlayerSide {
+        match self {
+            PlayerSide::White => PlayerSide::Black,
+            PlayerSide::Black => PlayerSide::White,
+            PlayerSide::None => PlayerSide::None,
         }
     }
 }
@@ -51,6 +62,7 @@ pub mod rest {
 
 pub mod actor {
     use actix::prelude::*;
+
     #[derive(Message)]
     #[rtype(usize)]
     pub struct ConnectMessage {
@@ -70,6 +82,13 @@ pub mod actor {
         pub id: usize,
         pub game_id: i32,
         pub side: crate::api::PlayerSide,
+    }
+
+    #[derive(Message)]
+    #[rtype(result = "()")]
+    pub struct NotifyMessage {
+        pub key: crate::wsserver::SubscribeKey,
+        pub msg: crate::api::ws::Message,
     }
 }
 pub mod ws {

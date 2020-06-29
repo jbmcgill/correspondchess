@@ -79,7 +79,26 @@
 		    <div id="statusDiv" class="status-box">In-play</div>
       </div>
 		  <div id="myBoard" class="board"></div>
-		  <div id="pgnDiv" class="pgn-box"></div>
+			<div id="action-box">
+				<toolbar>
+          <toolbar-button onClick="showAction('#pgn-box')" id="history-button" class="toolbar-button">History</toolbar-button>
+          <toolbar-button onClick="showAction('chat-box')" id="chat-button" class="toolbar-button">Chat</toolbar-button>
+				</toolbar>
+		    <div id="pgn-box" class="pgn-box"></div>
+		    <chat-box>
+					<chat-history>
+						Chat
+					</chat-history>
+				  <chat-footer>
+				    <chat-input-box>
+				      <input type="text" id="chat-input" />
+						</chat-input-box>
+						<chat-submit-box>
+				      <button id="chat-submit" onClick="clickChatSubmit()">Send</button>
+						</chat-submit-box>
+				  </chat-footer>
+				</chat-box>
+			</div>
 		  <h2>Export FEN</h2>
 	    <div id="fenDiv" class="status-box"></div>
     </div>
@@ -91,6 +110,7 @@
 	 <script src="js/random-names.js"></script>
 				<script>
 								showBox('#welcome-box');
+								showAction('#pgn-box');
 				</script>
 	</body>
 </html>

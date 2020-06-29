@@ -31,13 +31,14 @@ $(document).ready(function () {
       result.moves.forEach(mv => game.move(mv))
       board.position(game.fen())
       updateUI()
-      const socket = new WebSocket('ws://localhost:8080/ws/'+ game_slug)
+      const socket = new WebSocket('ws://10.0.0.238:8080/ws/'+ game_slug)
       socket.addEventListener('message', function (event) {
 	var o = JSON.parse(event.data).OpponentMove
 	game.move(o.san)
 	board.position(game.fen())
 	updateUI()
       });
+      // TODO: add event listener to disconnect attempt to reconnect
 
     },
     error: function (error) { console.log(error) },
@@ -47,7 +48,7 @@ $(document).ready(function () {
 function updateUI() {
 
   $('#fenDiv').html(game.fen())
-  $('#pgnDiv').html(game.pgn({ max_width: 5, newline_char: '<br />' }))
+  $('#pgn-box').html(game.pgn({ max_width: 5, newline_char: '<br />' }))
   var l = (game.history().length % 2) == 0 ? "White" : "Black"
   var status = "In-Play - " + l + " to move"
   if (game.in_stalemate()) {
@@ -133,6 +134,27 @@ function showBox(id) {
   if (id == '#create-game-box') {
     $('#white-handle').val(generateName())
     $('#black-handle').val(generateName())
+  }
+}
+
+var tabs_map = new Map()
+tabs_map.set("chat-box","#chat-button")
+tabs_map.set("#pgn-box","#history-button")
+function showAction(id){
+  $("#pgn-box").hide()
+  $("chat-box").hide()
+  $("#history-button").removeClass("toolbar-button-selected")
+  $("#chat-button").removeClass("toolbar-button-selected")
+  var tabId = tabs_map.get(id) 
+  $(tabId).addClass("toolbar-button-selected")
+  $(id).animate({ "opacity": "show" }, 200)
+}
+
+function clickChatSubmit(){
+  var txt = $("#chat-input").val()
+  if( txt != "" ){
+  	alert(txt)
+	$("#chat-input").val("")
   }
 }
 

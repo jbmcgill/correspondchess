@@ -29,16 +29,24 @@ body{
 .board-box {
   display: flex;
   flex-wrap: wrap;
-  width: 616px;
+  width: 750px;
   margin: 10 auto;
 }
-.pgn-box {
+
+#action-box{
+  display: flex;
+  flex-direction: column;
   margin-left: 16px;
   font-family: courier;
   font-size: 12pt;
-  height: 400px;
-  width: 200px;
+  height: 387px;
+  flex-grow: 1;
+  border: solid #ccc 5px;
+}
+.pgn-box, .chat-box {
   overflow: scroll;
+  background: #fff;
+  padding: 6px;
 }
 
 #welcome-box {
@@ -46,6 +54,7 @@ body{
   flex-wrap: none;
   margin: 16 auto;
 }
+
 #welcome-left {
   width: 45%;
   padding-right: 16px;
@@ -67,15 +76,15 @@ body{
 
 #create-game-box, #create-game-form, #game-created-box {
   display: flex;
-	flex-wrap: wrap;
-	width: 600px;
-	margin: 6px auto;
-	padding: 16px;
+  flex-wrap: wrap;
+  width: 600px;
+  margin: 6px auto;
+  padding: 16px;
 }
 
 #create-game-box, #game-created-box {
-	border: dashed #aaa 1px;
-	border-radius: 15px;
+  border: dashed #aaa 1px;
+  border-radius: 15px;
 }
 .cg-row{
   display: flex;
@@ -135,3 +144,63 @@ body{
   font-size: 12pt;
 }
 
+#chat-input {
+  width: 100%;
+  height: 100%;
+}
+
+toolbar {
+  display: flex; 
+  background-color: #fff;
+	flex-wrap: nowrap;
+	padding-bottom: 0px;
+  border: solid #ccc 1px;
+}
+
+toolbar-button{
+   margin: 6px;
+	 padding: 6px;
+	 background-color: #fff;
+	 margin-bottom: 0px;
+	 cursor: pointer;
+}
+toolbar-button:hover{
+  background-color: #eee;
+}
+
+.toolbar-button-selected {
+  background-color: #ddd;
+}
+
+chat-box{
+ flex-grow: 1;
+ display: flex;
+ flex-direction: column;
+ height: 100%;
+ width: 100%;
+}
+
+chat-history{
+  flex-grow: 1;
+	padding: 6px;
+	background: #fff;
+  border: solid #ccc 1px;
+}
+chat-footer{
+	height: 35px;
+	line-height: 35px;
+	padding: 6px;
+	border: solid #ccc 1px;
+	background: #fff;
+	margin-top: 6px;
+	display: flex;
+	flex-direction: row;
+}
+
+chat-input-box{
+  flex-grow: 1;
+}
+
+#chat-submit {
+  height: 100%;
+}

@@ -41,6 +41,7 @@ body{
   font-size: 12pt;
   height: 387px;
   flex-grow: 1;
+  max-width: 320px;
   border: solid #ccc 5px;
 }
 .pgn-box, .chat-box {
@@ -185,6 +186,8 @@ chat-history{
 	padding: 6px;
 	background: #fff;
   border: solid #ccc 1px;
+  max-height: 280px;
+  overflow-y: scroll;
 }
 chat-footer{
 	height: 35px;

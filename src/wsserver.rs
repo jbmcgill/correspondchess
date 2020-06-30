@@ -6,7 +6,7 @@ use actix::prelude::*;
 use rand::{self, rngs::ThreadRng, Rng};
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct SubscribeKey {
     pub game_id: i32,
     pub side: api::PlayerSide,
@@ -17,16 +17,16 @@ pub struct SubscribeKey {
 pub struct NotifyServer {
     sessions: HashMap<usize, Recipient<api::ws::Message>>,
     games: HashMap<SubscribeKey, HashSet<usize>>,
+    chats: HashMap<i32, HashSet<usize>>,
     rng: ThreadRng,
 }
 
 impl Default for NotifyServer {
     fn default() -> NotifyServer {
-        let games = HashMap::new();
-
         NotifyServer {
             sessions: HashMap::new(),
-            games,
+            games: HashMap::new(),
+            chats: HashMap::new(),
             rng: rand::thread_rng(),
         }
     }
@@ -43,6 +43,20 @@ impl NotifyServer {
             for id in sessions {
                 if let Some(addr) = self.sessions.get(id) {
                     let _ = addr.do_send(message.clone());
+                }
+            }
+        }
+    }
+    fn send_chat(&self, msg: api::actor::ChatMessage) {
+        println!("-> A");
+        if let Some(sessions) = self.chats.get(&msg.game_id) {
+            println!("-> B");
+            let m = api::ws::Message::ChatMessage(api::ws::ChatMessage::from(msg));
+            for id in sessions {
+                println!("-> C");
+                if let Some(addr) = self.sessions.get(id) {
+                    println!("-> D");
+                    let _ = addr.do_send(m.clone());
                 }
             }
         }
@@ -84,6 +98,9 @@ impl Handler<api::actor::DisconnectMessage> for NotifyServer {
             for (_n, sessions) in &mut self.games {
                 sessions.remove(&msg.id);
             }
+            for (_n, sessions) in &mut self.chats {
+                sessions.remove(&msg.id);
+            }
         }
     }
 }
@@ -92,8 +109,13 @@ impl Handler<api::actor::DisconnectMessage> for NotifyServer {
 impl Handler<api::actor::SubscribeMessage> for NotifyServer {
     type Result = ();
 
+
     fn handle(&mut self, msg: api::actor::SubscribeMessage, _: &mut SyncContext<Self>) {
+        println!("NotifyServer::Handler<SubscribeMessage>::handle()");
         for (_n, sessions) in &mut self.games {
+            sessions.remove(&msg.id);
+        }
+        for (_n, sessions) in &mut self.chats {
             sessions.remove(&msg.id);
         }
 
@@ -104,12 +126,17 @@ impl Handler<api::actor::SubscribeMessage> for NotifyServer {
             })
             .or_insert(HashSet::new())
             .insert(msg.id);
+
+        self.chats
+            .entry(msg.game_id)
+            .or_insert(HashSet::new())
+            .insert(msg.id);
     }
 }
 
 /// Handler for Notify message.
 ///
-/// Send a message to a game's subscribed clients. 
+/// Send a message to a game's subscribed clients.
 impl Handler<api::actor::NotifyMessage> for NotifyServer {
     type Result = ();
 
@@ -119,5 +146,14 @@ impl Handler<api::actor::NotifyMessage> for NotifyServer {
         _: &mut SyncContext<Self>,
     ) -> Self::Result {
         let _ = self.send_message(msg.key, msg.msg);
+    }
+}
+
+impl Handler<api::actor::ChatMessage> for NotifyServer {
+    type Result = ();
+
+    fn handle(&mut self, msg: api::actor::ChatMessage, _: &mut SyncContext<Self>) {
+        println!("NotifyServer::Handler<CHatMessage>::handle()");
+        let _ = self.send_chat(msg);
     }
 }

@@ -91,6 +91,14 @@ pub mod actor {
         pub key: crate::wsserver::SubscribeKey,
         pub msg: crate::api::ws::Message,
     }
+
+    #[derive(Clone, Debug, Message)]
+    #[rtype(result = "()")]
+    pub struct ChatMessage {
+       pub game_id: i32,
+       pub handle: String,
+       pub msg: String,
+    }
 }
 pub mod ws {
     use actix::prelude::*;
@@ -107,10 +115,22 @@ pub mod ws {
         }
     }
 
+    #[derive(Serialize, Deserialize, Debug, Clone)]
+    pub struct ChatMessage {
+        pub handle: String,
+        pub msg: String,
+    }
+    impl From<crate::api::actor::ChatMessage> for ChatMessage{
+        fn from(x: crate::api::actor::ChatMessage) -> ChatMessage {
+          ChatMessage{ handle: x.handle, msg: x.msg}
+        }
+    }
+
     #[derive(Clone, Debug, Message, Serialize, Deserialize)]
     #[rtype(result = "()")]
     pub enum Message {
         OpponentMove(PlayerMoveMessage),
+        ChatMessage(ChatMessage),
     }
 
     impl Message {

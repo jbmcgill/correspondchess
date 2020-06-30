@@ -36,19 +36,33 @@ async fn websocket_handler(
     slug: web::Path<String>,
 ) -> Result<HttpResponse, Error> {
     let ctx = data.into_inner();
+    println!("webapp::websocket_handler()");
     if let Ok(ids) = ctx.harsh.decode(slug.into_inner()) {
         let game_id = ids[1] as i32;
         let side = api::PlayerSide::from(ids[2]);
-        ws::start(
-            wssession::WsSession {
-                id: 0,
-                hb: Instant::now(),
-                subscription: wsserver::SubscribeKey { game_id, side },
-                addr: ctx.notify.clone(),
-            },
-            &req,
-            stream,
-        )
+        if let Ok(conn) = ctx.pool.get() {
+            let game = web::block(move || models::Game::find(&conn, game_id)).await?;
+            let handle = match side {
+                api::PlayerSide::Black => game.black,
+                api::PlayerSide::White => game.white,
+                api::PlayerSide::None => {
+                    return Err(Error::from(HttpResponse::InternalServerError().finish()))
+                }
+            };
+            ws::start(
+                wssession::WsSession {
+                    id: 0,
+                    hb: Instant::now(),
+                    handle: handle,
+                    subscription: wsserver::SubscribeKey { game_id, side },
+                    addr: ctx.notify.clone(),
+                },
+                &req,
+                stream,
+            )
+        } else {
+            Err(Error::from(HttpResponse::InternalServerError().finish()))
+        }
     } else {
         Err(Error::from(HttpResponse::InternalServerError().finish()))
     }

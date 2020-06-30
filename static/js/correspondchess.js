@@ -7,6 +7,7 @@ var blackSquareGrey = '#696969'
 var hash = $(location).attr('hash');
 var game_slug = hash.replace("#", "");
 var savedGames = loadSavedGames();
+var socket;
 $(document).ready(function () {
   var config = {
     draggable: true,
@@ -26,17 +27,27 @@ $(document).ready(function () {
     url: "/game/" + game_slug,
     type: "GET",
     contentType: "application/json; charset=utf-8",
+    error: function(e){ alert(e)},
     success: function (result) {
       if( result.side == "black" ) board.flip()
       result.moves.forEach(mv => game.move(mv))
       board.position(game.fen())
       updateUI()
-      const socket = new WebSocket('ws://10.0.0.238:8080/ws/'+ game_slug)
+      socket = new WebSocket('ws://10.0.0.238:8080/ws/'+ game_slug)
       socket.addEventListener('message', function (event) {
-	var o = JSON.parse(event.data).OpponentMove
-	game.move(o.san)
-	board.position(game.fen())
-	updateUI()
+	var o = JSON.parse(event.data)
+	if ("OpponentMove" in o ){
+		game.move(o.OpponentMove.san)
+		board.position(game.fen())
+		updateUI()
+	}else if ( "ChatMessage" in o ){
+		//alert(JSON.stringify(o.ChatMessage))
+		console.log("chatmessage received")
+		$("chat-history").append("<p><b>"+ o.ChatMessage.handle +"</b> "+ o.ChatMessage.msg +"</p>" )
+  		$("chat-history").scrollTop($("chat-history")[0].scrollHeight)
+	}else{
+		alert(event.data)
+	}
       });
       // TODO: add event listener to disconnect attempt to reconnect
 
@@ -63,7 +74,7 @@ function updateUI() {
     status = "Check - " + l + " to move"
   }
   $('#statusDiv').html("Status: " + status)
-  $('#pgnDiv').scrollTop($('#pgnDiv')[0].scrollHeight);
+  $('#pgn-div').scrollTop($('#pgn-div').scrollHeight);
 
 }
 
@@ -153,7 +164,7 @@ function showAction(id){
 function clickChatSubmit(){
   var txt = $("#chat-input").val()
   if( txt != "" ){
-  	alert(txt)
+	socket.send(JSON.stringify({"ChatMessage": {"handle": "NewMessage", "msg": txt}}))
 	$("#chat-input").val("")
   }
 }

@@ -18,6 +18,9 @@ pub struct WsSession {
     pub hb: Instant,
     /// subscribed to poll
     pub subscription: wsserver::SubscribeKey,
+
+    pub handle: String,
+
     /// Notification server
     pub addr: Addr<wsserver::NotifyServer>,
 }
@@ -28,6 +31,7 @@ impl Actor for WsSession {
     /// Method is called on actor start.
     /// We register ws session with ChatServer
     fn started(&mut self, ctx: &mut Self::Context) {
+        println!("WsSession::started()");
         // we'll start heartbeat process on session start.
         self.hb(ctx);
 
@@ -99,7 +103,21 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             ws::Message::Pong(_) => {
                 self.hb = Instant::now();
             }
-            ws::Message::Text(_text) => {}
+            ws::Message::Text(text) => {
+                let result: Result<api::ws::Message, serde_json::Error> =
+                    serde_json::from_str(text.as_str());
+
+                match result {
+                    Err(_e) => return,
+                    Ok(o) => match o {
+                        api::ws::Message::ChatMessage(m) => {
+                            println!("got chat message: {:?}", &m);
+                            let _ = self.addr.do_send(api::actor::ChatMessage{game_id: self.subscription.game_id, handle: self.handle.clone(), msg: m.msg});
+                        }
+                        _ => println!("unhandled"),
+                    },
+                }
+            }
             ws::Message::Binary(_) => println!("Unexpected binary"),
             ws::Message::Close(_) => {
                 ctx.stop();

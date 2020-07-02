@@ -23,6 +23,15 @@ $(document).ready(function () {
   jQuery('#myBoard').on('scroll touchmove touchend touchstart contextmenu', function (e) {
     e.preventDefault();
   });
+  $("#chat-input").on("keypress", function(e){
+    if(e.which == 13)
+    {
+	$("#chat-input").attr("disabled", "disabled")
+        clickChatSubmit()
+	$("#chat-input").removeAttr("disabled")
+	$("#chat-input").focus()
+    }
+  })
   $.ajax({
     url: "/game/" + game_slug,
     type: "GET",
@@ -166,6 +175,7 @@ function clickChatSubmit(){
   if( txt != "" ){
 	socket.send(JSON.stringify({"ChatMessage": {"handle": "NewMessage", "msg": txt}}))
 	$("#chat-input").val("")
+	$("#chat-input").focus()
   }
 }
 
@@ -184,13 +194,13 @@ function greySquare(square) {
   $square.css('background', background)
 }
 
-function onDragStart(source, piece) {
+function onDragStart(source, piece, position, orientation) {
   // do not pick up pieces if the game is over
   if (game.game_over()) return false
 
   // or if it's not that side's turn
-  if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-    (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+  if ((game.turn() === 'w' && (piece.search(/^b/) !== -1 || orientation === 'black')) ||
+    (game.turn() === 'b' && (piece.search(/^w/) !== -1 || orientation === 'white')) ) {
     return false
   }
 }

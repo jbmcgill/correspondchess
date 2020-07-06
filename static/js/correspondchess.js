@@ -62,6 +62,7 @@ function connectGame(){
             	game.move(o.OpponentMove.san)
             	board.position(game.fen())
             	updateUI()
+		$("#history-button").fadeOut(250).fadeIn(250).fadeOut(250).fadeIn(250)
             }else if ( "ChatMessage" in o ){
             	//alert(JSON.stringify(o.ChatMessage))
             	console.log("chatmessage received")
@@ -70,6 +71,7 @@ function connectGame(){
             	if( curAction != "chat-box" ){
             	  $("#chat-button").html("<b>Chat(!)</b>")
             	}
+		$("#chat-button").fadeOut(250).fadeIn(250).fadeOut(250).fadeIn(250)
             }else{
             	alert(event.data)
             }

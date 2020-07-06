@@ -6,7 +6,7 @@ var blackSquareGrey = '#696969'
 
 var hash = $(location).attr('hash');
 var game_slug = hash.replace("#", "");
-var savedGames = loadSavedGames();
+//var savedGames = loadSavedGames();
 var curAction;
 var socket;
 $(document).ready(function () {
@@ -142,7 +142,7 @@ function handleNewGameCreated(x) {
               turn: "white", 
               notes: ""
              }
-  localStorage.setItem(id, JSON.stringify(obj))
+  //localStorage.setItem(id, JSON.stringify(obj))
   $("#opponent-link").val(opponent_link)
   $("#your-link").val(your_link)
   showBox("#game-created-box")

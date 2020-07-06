@@ -37,6 +37,14 @@ $(document).ready(function () {
       showBox("#welcome-box")
   }else{
       showBox("#board-box")
+      connectGame()
+  }
+})
+
+function connectGame(){
+    if( socket ) {
+      socket.close()
+    }
       $.ajax({
         url: "/game/" + game_slug,
         type: "GET",
@@ -60,19 +68,17 @@ $(document).ready(function () {
             	$("chat-history").append("<p><b>"+ o.ChatMessage.handle +"</b> "+ o.ChatMessage.msg +"</p>" )
       		$("chat-history").scrollTop($("chat-history")[0].scrollHeight)
             	if( curAction != "chat-box" ){
-            	  $("#chat-button").html("Chat (!)")
+            	  $("#chat-button").html("<b>Chat(!)</b>")
             	}
             }else{
             	alert(event.data)
             }
           });
-          // TODO: add event listener to disconnect attempt to reconnect
-
         },
         error: function (error) { console.log(error) },
       })
-  }
-})
+          // TODO: add event listener to disconnect attempt to reconnect
+}
 
 function updateUI() {
 
@@ -94,6 +100,14 @@ function updateUI() {
   $('#statusDiv').html("Status: " + status)
   $('#pgn-div').scrollTop($('#pgn-div').scrollHeight);
 
+}
+
+function joinGame(){
+  var code = $("#join-code-text").val()
+  window.location.hash = code
+  game_slug = code
+  showBox("#board-box")
+  connectGame()
 }
 
 function loadSavedGames(){

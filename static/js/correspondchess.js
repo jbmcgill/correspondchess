@@ -55,7 +55,12 @@ function connectGame(){
           result.moves.forEach(mv => game.move(mv))
           board.position(game.fen())
           updateUI()
-          socket = new WebSocket('ws://10.0.0.238:8080/ws/'+ game_slug)
+	  var protocol = 'ws'
+	  if( window.location.protocol == 'https' ){
+            protocol = 'wss'
+	  }
+	  var wsurl = protocol+'://'+ window.location.hostname +':'+ window.location.port +'/ws/'+ game_slug
+          socket = new WebSocket(wsurl)
           socket.addEventListener('message', function (event) {
             var o = JSON.parse(event.data)
             if ("OpponentMove" in o ){

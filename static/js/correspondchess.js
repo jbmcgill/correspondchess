@@ -67,6 +67,9 @@ function connectGame(){
             	game.move(o.OpponentMove.san)
             	board.position(game.fen())
             	updateUI()
+            	if( curAction != "#pgn-box" ){
+            	  $("#history-button").html("<b>History(!)</b>")
+            	}
 		$("#history-button").fadeOut(250).fadeIn(250).fadeOut(250).fadeIn(250)
             }else if ( "ChatMessage" in o ){
             	//alert(JSON.stringify(o.ChatMessage))
@@ -201,6 +204,9 @@ function showAction(id){
   curAction = id
   if( id == "chat-box" ){
     $("#chat-button").html("Chat")
+  }
+  if( id == "#pgn-box" ){
+    $("#history-button").html("History")
   }
 }
 

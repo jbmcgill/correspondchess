@@ -70,7 +70,8 @@ function connectGame(){
             	if( curAction != "#pgn-box" ){
             	  $("#history-button").html("<b>History(!)</b>")
             	}
-		$("#history-button").fadeOut(250).fadeIn(250).fadeOut(250).fadeIn(250)
+		flash("#history-button")
+		flash("#statusDiv")
             }else if ( "ChatMessage" in o ){
             	//alert(JSON.stringify(o.ChatMessage))
             	console.log("chatmessage received")
@@ -79,7 +80,7 @@ function connectGame(){
             	if( curAction != "chat-box" ){
             	  $("#chat-button").html("<b>Chat(!)</b>")
             	}
-		$("#chat-button").fadeOut(250).fadeIn(250).fadeOut(250).fadeIn(250)
+		flash("#chat-button")
             }else{
             	alert(event.data)
             }
@@ -90,6 +91,9 @@ function connectGame(){
           // TODO: add event listener to disconnect attempt to reconnect
 }
 
+function flash(id){
+    $(id).fadeOut(250).fadeIn(250).fadeOut(250).fadeIn(250)
+}
 function updateUI() {
 
   $('#fenDiv').html(game.fen())
